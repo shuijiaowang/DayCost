@@ -8,4 +8,5 @@ type User struct {
 	Password  string    `gorm:"not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	//如何用户表发生变动的话，这里添加字段
 }

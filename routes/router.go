@@ -2,7 +2,6 @@ package routes
 
 import (
 	"DayCost/internal/handler"
-
 	"github.com/gin-gonic/gin"
 )
 
