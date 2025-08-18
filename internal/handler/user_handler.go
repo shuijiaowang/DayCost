@@ -24,18 +24,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		util.SendBadRequest(c, "无效的请求格式")
+		util.Result(c, 404, "无效的请求格式", nil)
 		return
 	}
 
 	user, ok := h.authService.Login(req.Name, req.Password)
 	if !ok {
-		util.SendUnauthorized(c, "用户名或密码错误")
+		util.Result(c, 401, "用户名或密码错误", nil)
 		return
 	}
 
 	// 简化响应（实际应返回JWT token）
-	util.SendSuccess(c, gin.H{
+	util.Result(c, 200, "ok", gin.H{
 		"id":   user.ID,
 		"name": user.Name,
 	})
