@@ -20,11 +20,11 @@ type Config struct {
 func InitDB() error {
 	// 简化配置（实际项目中应从环境变量读取）
 	cfg := Config{
-		Host:     "localhost",
-		Port:     "3306",
-		User:     "root",
-		Password: "123456",
-		DBName:   "daycost",
+		Host:     "mysql2.sqlpub.com",
+		Port:     "3307",
+		User:     "shuijiaowang",
+		Password: "uOsGjEWCXerZhWVC",
+		DBName:   "shuijiaowang",
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",

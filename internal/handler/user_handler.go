@@ -3,7 +3,6 @@ package handler
 import (
 	"DayCost/internal/service"
 	"DayCost/pkg/util"
-
 	"github.com/gin-gonic/gin"
 )
 
