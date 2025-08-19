@@ -20,3 +20,7 @@ func (s *ExpenseService) AddExpense(expense *model.Expense) {
 	s.expenseRepo.AddExpense(expense)
 	return
 }
+func (s *ExpenseService) GetExpenseById(id int) model.Expense {
+	return s.expenseRepo.GetExpenseById(id)
+
+}

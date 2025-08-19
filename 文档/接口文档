@@ -1,6 +1,0 @@
-接口名，url，传入参数，返回值
-
-用户登录
-url：/user/login
-传入参数：username，password
-返回值：token

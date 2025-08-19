@@ -20,7 +20,7 @@ func NewExpenseHandler() *ExpenseHandler {
 	}
 }
 func (h *ExpenseHandler) AddExpense(c *gin.Context) {
-	fmt.Println("---------读取参数")
+
 	// JWT,从上下文获取用户ID
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -30,7 +30,7 @@ func (h *ExpenseHandler) AddExpense(c *gin.Context) {
 	//接收参数  //使用结构体来接收
 
 	// 2. 绑定并验证前端请求参数
-	var req dto.CreateExpenseRequest
+	var req dto.ExpenseCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		util.Result(c, 400, "无效的请求格式: "+err.Error(), nil)
 		return
@@ -54,4 +54,25 @@ func (h *ExpenseHandler) AddExpense(c *gin.Context) {
 	//}
 	util.Result(c, 200, "添加成功", nil)
 
+}
+func (h *ExpenseHandler) GetExpenseById(c *gin.Context) {
+	// JWT,从上下文获取用户ID
+	userID, exists := c.Get("userID")
+	if !exists {
+		util.Result(c, 401, "未获取到用户信息", nil)
+		return
+	}
+	//怎么获取路径参数
+	id := c.Param("id")
+	expense := h.expnseService.GetExpenseById(id)
+	result := dto.ExpenseResponse{
+		ID:          expense.ID,
+		Note:        expense.Note,
+		Amount:      expense.Amount,
+		Remarks:     expense.Remarks,
+		ExpenseDate: expense.ExpenseDate,
+		Category:    expense.Category,
+	}
+
+	util.Result(c, 200, "查询成功", result)
 }

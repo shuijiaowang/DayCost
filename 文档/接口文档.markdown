@@ -1,0 +1,12 @@
+## 基础说明
+- 接口返回格式统一为：{"code": 状态码, "message": "提示信息", "data": 数据内容}
+- 需授权接口需在请求头携带 Authorization: Bearer <token>
+- 日期参数格式统一为 YYYY-MM-DD
+# 用户
+## 登陆
+url：/user/login
+传入参数：username，password
+返回值：token
+## 注册
+
+添加消费记录
