@@ -1,0 +1,57 @@
+-- 用户表 (存储用户基本信息)
+CREATE TABLE user (
+    id         INT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
+    username   VARCHAR(50) UNIQUE NOT NULL COMMENT '用户名',
+    password   VARCHAR(100)       NOT NULL COMMENT '加密密码',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
+) COMMENT '用户信息表';
+
+-- 消费基础表 (记录所有消费)
+CREATE TABLE expense (
+    id           INT PRIMARY KEY AUTO_INCREMENT COMMENT '消费ID',
+    user_id      INT            NOT NULL COMMENT '关联用户ID',
+    note         VARCHAR(100)   NOT NULL COMMENT '物品名称/消费摘要',
+    amount       DECIMAL(10, 2) NOT NULL COMMENT '消费金额',
+    remarks      TEXT COMMENT '详细备注(支持扩展标签)',
+    expense_date DATE           NOT NULL COMMENT '消费日期',
+    category     TINYINT        NOT NULL COMMENT '消费分类(0:餐饮,1:日用,2:交通...)',
+    is_extended  BOOLEAN       DEFAULT 0 COMMENT '是否为扩展消费',
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at   TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
+) COMMENT '消费记录表';
+
+-- 扩展消费属性表 (一对一关联)
+CREATE TABLE expense_ext (
+    id             INT PRIMARY KEY AUTO_INCREMENT COMMENT '扩展ID',
+    expense_id     INT UNIQUE NOT NULL COMMENT '关联消费ID',
+    expense_type   TINYINT    NOT NULL COMMENT '类型(0:时间型,1:数量型)',
+    start_date     DATE       NOT NULL COMMENT '开始使用日期',
+    estimated_days SMALLINT COMMENT '预计使用天数(时间型)',
+    end_date       DATE COMMENT '实际结束日期',
+    total_quantity DECIMAL(10, 4) COMMENT '总数量(数量型)',
+    remaining      DECIMAL(10, 4) COMMENT '剩余量(数量型)',
+    `status`       TINYINT    DEFAULT 1 COMMENT '状态(0:进行中,1:已结束)',
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at     TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
+) COMMENT '扩展消费属性表';
+
+-- 数量消费记录表 (使用记录)
+CREATE TABLE expense_usage (
+    id            INT PRIMARY KEY AUTO_INCREMENT COMMENT '使用记录ID',
+    extended_id   INT            NOT NULL COMMENT '关联扩展ID',
+    use_date      DATE           NOT NULL COMMENT '使用日期',
+    used_value    DECIMAL(10, 4) NOT NULL COMMENT '消耗值(数量/比例)',
+    notes         VARCHAR(100) COMMENT '使用备注',
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at    TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
+) COMMENT '数量消费使用记录表';
+
+//TIMESTAMP占用4字节 ，'1970-01-01 00:00:01' UTC 到 '2038-01-19 03:14:07' UTC
+//DATETIME占用5-8字节，'1000-01-01 00:00:00' 到 '9999-12-31 23:59:59'
+//DATE占用3字节，只存储日期，1000-01-01 到 9999-12-31
+//
