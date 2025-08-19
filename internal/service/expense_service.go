@@ -1,8 +1,8 @@
 package service
 
 import (
+	"DayCost/internal/model"
 	"DayCost/internal/repository"
-	"time"
 )
 
 type ExpenseService struct {
@@ -16,7 +16,7 @@ func NewExpenseService() *ExpenseService {
 }
 
 // 这里得一个一个参数传递，还是封装个vo对象
-func (s *ExpenseService) AddExpense(note string, amount float64, category int, expenseDate time.Time) {
-	s.expenseRepo.AddExpense(note, amount, category, expenseDate)
+func (s *ExpenseService) AddExpense(expense *model.Expense) {
+	s.expenseRepo.AddExpense(expense)
 	return
 }

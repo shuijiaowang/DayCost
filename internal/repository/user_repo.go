@@ -12,7 +12,7 @@ type UserRepository struct{}
 func (r *UserRepository) FindUserByName(name string) (*model.User, error) {
 	var user model.User
 	// Where 条件查询 + First 获取第一条记录
-	result := database.DB.Where("name = ?", name).First(&user)
+	result := database.DB.Where("username = ?", name).First(&user)
 	return &user, result.Error
 }
 

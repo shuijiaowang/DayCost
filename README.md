@@ -18,14 +18,15 @@
 简化开发，不使用外键，手动联删,软删除
 均包含
 ```mysql
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-deleted_at TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at TIMESTAMP NULL DEFAULT NULL COMMENT '删除时间(软删除标志)'
 ```
+日期则使用DATE类型即可。
 ### 用户表
 
 ```mysql
-CREATE TABLE users
+CREATE TABLE user
     id：用户ID (主键自增)
     username：用户名 (唯一)
     password：加密密码);
@@ -34,13 +35,14 @@ CREATE TABLE users
 ### 基本消费表（一次性）expenses
 
 ```mysql
-id：消费ID (主键自增)
-user_id：关联用户ID
-note：物品名称/消费摘要 //默认使用标签
-amount：消费金额
-expense_date：消费日期
-category：分类 (0:餐饮,1:日用,2:交通...)
-is_extended：是否扩展消费 (0:否,1:是)
+CREATE TABLE expense(
+    id：消费ID (主键自增)
+    user_id：关联用户ID
+    note：物品名称/消费摘要 //默认使用标签
+    amount：消费金额
+    expense_date：消费日期
+    category：分类 (0:餐饮,1:日用,2:交通...)
+    is_extended：是否扩展消费 (0:否,1:是)
 ```
 （分类是固定的不需要新建表，全局变量写在程序中，可以吧？）
 （非拓展则为一次性消费）
@@ -52,25 +54,28 @@ is_extended：是否扩展消费 (0:否,1:是)
 
 ```mysql
 -- 拓展消费属性表（一对一关联）
-CREATE TABLE expenses_extended(
-expense_id：关联消费ID (唯一)
-expense_type：类型 (0:时间型,1:数量型)
-start_date：开始日期,
-estimated_days：预计天数,
-end_date：结束日期
-total_quantity：总数量,
-remaining：剩余量
-status：状态 (0:进行中,1:已结束)
+    CREATE TABLE expense_ext(
+    id：拓展ID (主键自增)
+    expense_id：关联消费ID (唯一)
+    expense_type：类型 (0:时间型,1:数量型)
+    start_date：开始日期,
+    estimated_days：预计天数,
+    end_date：结束日期
+    total_quantity：总数量,
+    remaining：剩余量
+    status：状态 (0:进行中,1:已结束)
 ```
 ### 数量消费表 expense_usages
 
 ```mysql
 -- 数量消费使用记录表
-CREATE TABLE expense_usages
+CREATE TABLE expense_usage
 (
-extended_id：关联扩展ID
-use_date：使用日期
-used_value：消耗值 (数量/比例)
+    id：使用ID (主键自增)
+    extended_id：关联扩展ID
+    use_date：使用日期
+    used_value：消耗值 (数量/比例)
+    notes：备注
 ```
 
 例如我做晚餐，消耗量一个土豆和三分之一左右的肉，还有油/盐等

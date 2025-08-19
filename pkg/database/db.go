@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 var DB *gorm.DB
@@ -31,7 +31,11 @@ func InitDB() error {
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 
 	var err error
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true, // 使用单数表名
+		},
+	})
 	if err != nil {
 		return err
 	}
