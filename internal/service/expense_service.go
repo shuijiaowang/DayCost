@@ -1,6 +1,7 @@
 package service
 
 import (
+	"DayCost/internal/dto"
 	"DayCost/internal/model"
 	"DayCost/internal/repository"
 )
@@ -20,7 +21,34 @@ func (s *ExpenseService) AddExpense(expense *model.Expense) {
 	s.expenseRepo.AddExpense(expense)
 	return
 }
-func (s *ExpenseService) GetExpenseById(id int) model.Expense {
-	return s.expenseRepo.GetExpenseById(id)
+func (s *ExpenseService) GetExpenseById(expenseID string, userID string) (*model.Expense, error) {
+	// 直接调用Repo的方法，传入两个ID
+	expense, err := s.expenseRepo.FindByIDAndUserID(expenseID, userID)
+	if err != nil {
+		return nil, err // Repo层可能返回 gorm.ErrRecordNotFound
+	}
+	return expense, nil
+}
 
+func (s *ExpenseService) ListExpense(userID string) ([]*model.Expense, error) { // 返回切片
+	expenses, err := s.expenseRepo.ListExpense(userID)
+	if err != nil {
+		return nil, err
+	}
+	return expenses, nil
+}
+
+// 条件分页查询
+func (s *ExpenseService) ListExpenseByCondition(query dto.ExpensePagesQuery) ([]dto.ExpenseResponse, int64, error) {
+	expenses, total, err := s.expenseRepo.ListByCondition(query)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var responses []dto.ExpenseResponse
+	for _, exp := range expenses {
+		responses = append(responses, dto.ToResultExpense(exp))
+	}
+
+	return responses, total, nil
 }

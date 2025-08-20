@@ -3,10 +3,10 @@
 - 需授权接口需在请求头携带 Authorization: Bearer <token>
 - 日期参数格式统一为 YYYY-MM-DD
 # 用户
-## 登陆
-url：/user/login
-传入参数：username，password
-返回值：token
-## 注册
+## 登陆 √ （name,password）=>token
+## 注册 -
 
-添加消费记录
+# 消费记录
+## 添加消费记录 √ （Note,Amount,Remarks,category,ExpenseDate）=>
+## 获取消费记录ById √ （id）+（token）=>(id,Note,Amount,Remarks,category,ExpenseDate,IsExtended)
+## 获取所有消费记录 √ （token）=>(id,Note,Amount,Remarks,category,ExpenseDate,IsExtended)[]

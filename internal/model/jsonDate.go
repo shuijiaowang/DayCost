@@ -81,3 +81,5 @@ func (j JSONDate) ToTime() time.Time {
 func (j JSONDate) String() string {
 	return time.Time(j).Format("2006-01-02")
 }
+
+//需要添加一个函数把time。time类型的转为格式

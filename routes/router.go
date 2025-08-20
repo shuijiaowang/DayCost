@@ -30,9 +30,10 @@ func SetupRouter() *gin.Engine {
 		// 消费记录路由（需要认证）
 		expenseGroup := apiGroup.Group("/expenses")
 		{
-			expenseGroup.POST("/", expenseHandler.AddExpense) // 添加消费记录
-			//expenseGroup.GET("/:id", expenseHandler.GetExpense) // 获取单个消费记录
-			expenseGroup.GET("/", expenseHandler.ListExpense) // 获取消费记录列表
+			expenseGroup.POST("/", expenseHandler.AddExpense)              // 添加消费记录
+			expenseGroup.GET("/:id", expenseHandler.GetExpenseById)        // 获取单个消费记录
+			expenseGroup.GET("/", expenseHandler.ListExpense)              // 获取消费记录列表
+			expenseGroup.GET("/by", expenseHandler.ListExpenseByCondition) // 获取消费记录列表
 			//expenseGroup.PUT("/:id", expenseHandler.UpdateExpense) // 更新消费记录
 			//expenseGroup.DELETE("/:id", expenseHandler.DeleteExpense) // 删除消费记录
 
