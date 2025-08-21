@@ -5,6 +5,7 @@ import (
 	"DayCost/internal/model"
 	"DayCost/pkg/database"
 	"fmt"
+	"time"
 )
 
 type ExpenseRepository struct{}
@@ -83,6 +84,10 @@ func (r *ExpenseRepository) ListByCondition(query dto.ExpensePagesQuery) ([]*mod
 	if query.IsExtended != nil {
 		db = db.Where("is_extended = ?", query.IsExtended)
 	}
+	// 交易类型（支出还是收入）
+	if query.TransactionType != nil {
+		db = db.Where("transaction_type = ?", query.TransactionType)
+	}
 
 	// 获取总记录数（必须先Count再排序/分页，否则总条数会受分页影响）
 	var total int64
@@ -113,4 +118,123 @@ func (r *ExpenseRepository) ListByCondition(query dto.ExpensePagesQuery) ([]*mod
 		return nil, 0, fmt.Errorf("查询消费记录失败: %w", err)
 	}
 	return expenses, total, nil
+}
+
+// 修改
+func (r *ExpenseRepository) UpdateExpense(expense *model.Expense) error {
+	result := database.DB.Model(&model.Expense{}).
+		Select("Note", "Amount", "Remarks", "ExpenseDate", "Category", "IsExtended").
+		Where("id = ? AND user_id = ?", expense.ID, expense.UserID).
+		Updates(expense)
+
+	if result.Error != nil {
+		return fmt.Errorf("更新消费记录失败: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("记录不存在或无权修改")
+	}
+
+	return nil
+}
+
+// 更新IsExtended
+func (r *ExpenseRepository) UpdateIsExtended(id int, userID int, isExtended bool) error {
+	return database.DB.Model(&model.Expense{}).
+		Where("id = ? AND user_id = ?", id, userID).
+		Update("is_extended", isExtended).Error
+}
+
+// 删除
+func (r *ExpenseRepository) DeleteExpense(expenseID string, userID string) error {
+	result := database.DB.Where("id = ? AND user_id = ?", expenseID, userID).Delete(&model.Expense{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+// 恢复
+func (r *ExpenseRepository) RecoverExpense(expenseID string, userID string) error {
+	return database.DB.Unscoped().Model(&model.Expense{}).
+		Where("id = ? AND user_id = ?", expenseID, userID).
+		Update("deleted_at", nil).Error
+}
+
+// StatisticByMonth 按月份统计每日收支
+func (r *ExpenseRepository) StatisticByMonth(month string, userID string) ([]dto.ExpenseDay, error) {
+	// 计算月份的起止日期
+	startDate := month + "-01"
+	// 解析月份最后一天
+	lastDay, err := getLastDayOfMonth(month)
+	if err != nil {
+		return nil, err
+	}
+	endDate := month + "-" + lastDay
+
+	// SQL查询：按天分组统计收支
+	var stats []struct {
+		Date    string  `gorm:"column:date"`
+		Expense float64 `gorm:"column:expense"`
+		Income  float64 `gorm:"column:income"`
+	}
+
+	err = database.DB.Raw(`
+		SELECT 
+			DATE_FORMAT(expense_date, '%Y-%m-%d') as date,
+			SUM(CASE WHEN transaction_type = 0 THEN amount ELSE 0 END) as expense,
+			SUM(CASE WHEN transaction_type = 1 THEN amount ELSE 0 END) as income
+		FROM expense
+		WHERE user_id = ? 
+			AND expense_date BETWEEN ? AND ?
+			AND deleted_at IS NULL
+		GROUP BY expense_date
+		ORDER BY date
+	`, userID, startDate, endDate).Scan(&stats).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("统计查询失败: %w", err)
+	}
+
+	// 转换为DTO并补全当月所有日期（包括无数据的日期）
+	statMap := make(map[string]dto.ExpenseDay)
+	for _, s := range stats {
+		statMap[s.Date] = dto.ExpenseDay{
+			Date:    s.Date,
+			Expense: s.Expense,
+			Income:  s.Income,
+		}
+	}
+
+	// 生成当月所有日期并填充数据
+	var result []dto.ExpenseDay
+	current, _ := time.Parse("2006-01-02", startDate)
+	end, _ := time.Parse("2006-01-02", endDate)
+
+	for !current.After(end) {
+		dateStr := current.Format("2006-01-02")
+		if stat, ok := statMap[dateStr]; ok {
+			result = append(result, stat)
+		} else {
+			result = append(result, dto.ExpenseDay{
+				Date:    dateStr,
+				Expense: 0,
+				Income:  0,
+			})
+		}
+		current = current.AddDate(0, 0, 1)
+	}
+
+	return result, nil
+}
+
+// 辅助函数：获取月份最后一天
+func getLastDayOfMonth(month string) (string, error) {
+	t, err := time.Parse("2006-01", month)
+	if err != nil {
+		return "", err
+	}
+	// 下个月第一天减一天就是当月最后一天
+	lastDay := t.AddDate(0, 1, -1).Format("02")
+	return lastDay, nil
 }

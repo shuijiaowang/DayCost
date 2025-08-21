@@ -39,16 +39,35 @@ func (s *ExpenseService) ListExpense(userID string) ([]*model.Expense, error) { 
 }
 
 // 条件分页查询
-func (s *ExpenseService) ListExpenseByCondition(query dto.ExpensePagesQuery) ([]dto.ExpenseResponse, int64, error) {
+func (s *ExpenseService) ListExpenseByCondition(query dto.ExpensePagesQuery) ([]dto.ExpenseDto, int64, error) {
 	expenses, total, err := s.expenseRepo.ListByCondition(query)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	var responses []dto.ExpenseResponse
+	var responses []dto.ExpenseDto
 	for _, exp := range expenses {
 		responses = append(responses, dto.ToResultExpense(exp))
 	}
 
 	return responses, total, nil
+}
+
+func (s *ExpenseService) UpdateExpense(expense *model.Expense) error {
+	return s.expenseRepo.UpdateExpense(expense)
+}
+
+// 删
+func (s *ExpenseService) DeleteExpense(expenseID string, userID string) error {
+	return s.expenseRepo.DeleteExpense(expenseID, userID)
+}
+
+// 恢复
+func (s *ExpenseService) RecoverExpense(expenseID string, userID string) error {
+	return s.expenseRepo.RecoverExpense(expenseID, userID)
+}
+
+// Statistic 获取指定月份的每日收支统计
+func (s *ExpenseService) Statistic(month string, userID string) ([]dto.ExpenseDay, error) {
+	return s.expenseRepo.StatisticByMonth(month, userID)
 }
