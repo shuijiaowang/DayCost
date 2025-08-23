@@ -39,10 +39,31 @@ func (h *ExpenseExtHandler) AddExpenseExt(c *gin.Context) {
 		Remaining:        req.Remaining,
 	}
 
+	ok := h.expenseExtService.CheckExpenseOwner(userID, req.ExpenseID)
+	if !ok {
+		util.Result(c, 500, "添加失败: "+err.Error(), nil)
+		return
+	}
 	err := h.expenseExtService.AddExpenseExt(userID, expenseExt)
 	if err != nil {
 		util.Result(c, 500, "添加失败: "+err.Error(), nil)
 		return
 	}
 	util.Result(c, 200, "添加成功", nil)
+}
+
+// GetExpenseExtById
+func (h *ExpenseExtHandler) GetExpenseExtById(c *gin.Context) {
+	userID, ok := h.GetUserID(c)
+	if !ok {
+		return
+	}
+	id := c.Param("id")
+	expenseExt, err := h.expenseExtService.GetExpenseExtById(userID, id)
+	if err != nil {
+		util.Result(c, 500, "获取失败: "+err.Error(), nil)
+		return
+	}
+	util.Result(c, 200, "获取成功", expenseExt)
+
 }

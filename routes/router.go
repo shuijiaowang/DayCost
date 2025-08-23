@@ -42,8 +42,8 @@ func SetupRouter() *gin.Engine {
 		// 消费拓展路由（需要认证）
 		expenseExtGroup := apiGroup.Group("/expense-ext") //路由使用驼峰？
 		{
-			expenseExtGroup.POST("/", expenseExtHandler.AddExpenseExt) // 添加
-			//expenseExtGroup.GET("/:id", expenseExtHandler.GetExpenseExtById)        // 获取单个
+			expenseExtGroup.POST("/", expenseExtHandler.AddExpenseExt)       // 添加
+			expenseExtGroup.GET("/:id", expenseExtHandler.GetExpenseExtById) // 获取单个
 			//expenseExtGroup.GET("/", expenseExtHandler.ListExpenseExt)              // 获取列表
 			//expenseExtGroup.GET("/by", expenseExtHandler.ListExpenseExtByCondition) // 获取列表条件分页
 			//expenseExtGroup.PUT("/", expenseExtHandler.UpdateExpenseExt)            // 更新

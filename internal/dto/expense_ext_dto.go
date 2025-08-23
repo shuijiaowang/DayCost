@@ -7,9 +7,8 @@ import (
 // 联合DTO：同时包含普通消费更新和拓展消费信息
 
 type ExpenseExtDto struct {
-	ID        int `json:"id" comment:"扩展ID"`
-	ExpenseID int `json:"expense_id" comment:"关联消费ID"`
-	//UserID           int             `json:"user_id"`
+	ID               int             `json:"id" comment:"扩展ID"`
+	ExpenseID        int             `json:"expense_id" comment:"关联消费ID"`
 	ExpenseType      int8            `json:"expense_type" comment:"类型(0:时间型,1:数量型)"`
 	StartDate        model.JSONDate  `json:"start_date" comment:"开始使用日期"`
 	EstimatedEndDate *model.JSONDate `json:"estimated_end_date" comment:"预计结束日期(时间型)"`
