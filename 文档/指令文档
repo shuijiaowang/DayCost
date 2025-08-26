@@ -1,0 +1,4 @@
+项目打包，需要用到cmd命令，放到linux上可执行文件
+set GOOS=linux
+set GOARCH=amd64
+go build -o daycost cmd/main.go
