@@ -6,7 +6,6 @@ import (
 )
 
 type ExpenseExtService struct {
-	BaseService
 	expenseExtRepo *repository.ExpenseExtRepository
 	expenseRepo    *repository.ExpenseRepository
 }
@@ -19,10 +18,6 @@ func NewExpenseExtService() *ExpenseExtService {
 
 // err := h.expenseExtService.AddExpenseExt(userID,req)
 func (h *ExpenseExtService) AddExpenseExt(userID int, req *model.ExpenseExt) error {
-	//err := h.baseRepo.CheckExpenseOwner(userID, req.ExpenseID)
-	//if err != nil {
-	//	return err
-	//}
 	err := h.expenseRepo.UpdateIsExtended(req.ExpenseID, userID, true)
 	if err != nil {
 		return err
@@ -32,4 +27,12 @@ func (h *ExpenseExtService) AddExpenseExt(userID int, req *model.ExpenseExt) err
 		return err
 	}
 	return nil
+}
+func (h *ExpenseExtService) GetExpenseExtById(id int) (*model.ExpenseExt, error) {
+	expenseExt, err := h.expenseExtRepo.GetExpenseExtById(id)
+	if err != nil {
+		return nil, err // Repo层可能返回 gorm.ErrRecordNotFound
+	}
+	return expenseExt, nil
+
 }

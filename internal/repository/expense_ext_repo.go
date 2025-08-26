@@ -10,17 +10,17 @@ type ExpenseExtRepository struct {
 	BaseRepository // 嵌入基础Repository，复用CheckExpenseOwner
 }
 
-// 使用时直接调用父类方法
-func (r *ExpenseExtRepository) Test1(ext *model.ExpenseExt, userID int) error {
-	if err := r.CheckExpenseOwner(ext.ExpenseID, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
 // h.expenseExtRepo.AddExpenseExt(req)
 // 函数声明开始
 func (r *ExpenseExtRepository) AddExpenseExt(expenseExt *model.ExpenseExt) error {
 	tx := database.DB.Create(expenseExt)
 	return tx.Error
+}
+
+// expenseExt,err:= h.expenseExtRepo.GetExpenseExtById(id)
+func (r *ExpenseExtRepository) GetExpenseExtById(id int) (*model.ExpenseExt, error) {
+
+	expenseExt := &model.ExpenseExt{}
+	tx := database.DB.First(expenseExt, id)
+	return expenseExt, tx.Error
 }

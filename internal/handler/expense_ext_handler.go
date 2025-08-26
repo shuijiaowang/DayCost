@@ -5,6 +5,7 @@ import (
 	"DayCost/internal/model"
 	"DayCost/internal/service"
 	"DayCost/pkg/util"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,7 @@ type ExpenseExtHandler struct {
 // 构造
 func NewExpenseExtHandler() *ExpenseExtHandler {
 	return &ExpenseExtHandler{
+		BaseHandler:       *NewBaseHandler(), // 关键：初始化父结构体
 		expenseExtService: service.NewExpenseExtService(),
 	}
 }
@@ -38,12 +40,12 @@ func (h *ExpenseExtHandler) AddExpenseExt(c *gin.Context) {
 		TotalQuantity:    req.TotalQuantity,
 		Remaining:        req.Remaining,
 	}
-
-	ok := h.expenseExtService.CheckExpenseOwner(userID, req.ExpenseID)
-	if !ok {
-		util.Result(c, 500, "添加失败: "+err.Error(), nil)
+	// 检查是否为该用户
+	isOwner := h.CheckExpenseExtOwner(c, userID, req.ExpenseID)
+	if !isOwner {
 		return
 	}
+	// 添加
 	err := h.expenseExtService.AddExpenseExt(userID, expenseExt)
 	if err != nil {
 		util.Result(c, 500, "添加失败: "+err.Error(), nil)
@@ -58,8 +60,19 @@ func (h *ExpenseExtHandler) GetExpenseExtById(c *gin.Context) {
 	if !ok {
 		return
 	}
-	id := c.Param("id")
-	expenseExt, err := h.expenseExtService.GetExpenseExtById(userID, id)
+
+	idStr := c.Param("id") //查询id
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		util.Result(c, 400, "id参数错误", nil)
+		return
+	}
+	// 检查是否为该用户
+	isOwner := h.CheckExpenseExtOwner(c, userID, id)
+	if !isOwner {
+		return
+	}
+	expenseExt, err := h.expenseExtService.GetExpenseExtById(id)
 	if err != nil {
 		util.Result(c, 500, "获取失败: "+err.Error(), nil)
 		return
