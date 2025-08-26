@@ -2,13 +2,23 @@
 package handler
 
 import (
+	"DayCost/internal/service"
 	"DayCost/pkg/util"
 
 	"github.com/gin-gonic/gin"
 )
 
 // BaseHandler 基础Handler，封装公共逻辑
-type BaseHandler struct{}
+type BaseHandler struct {
+	baseService *service.BaseService
+}
+
+// 初始化
+func NewBaseHandler() *BaseHandler {
+	return &BaseHandler{
+		baseService: service.NewBaseService(),
+	}
+}
 
 // Bind 通用参数绑定方法，自动处理绑定错误
 func (h *BaseHandler) Bind(c *gin.Context, req interface{}) bool {
@@ -32,6 +42,14 @@ func (h *BaseHandler) GetUserID(c *gin.Context) (int, bool) {
 		util.Result(c, 401, "无效的用户ID类型", nil)
 		return 0, false
 	}
-
 	return id, true
+}
+
+// 判断expenseID和userId是否匹配来判断是否有权限？
+func (h *BaseHandler) CheckExpenseExtOwner(c *gin.Context, userID int, expenseID int) bool {
+	err := h.baseService.CheckExpenseExtOwner(userID, expenseID)
+	if err != nil {
+		util.Result(c, 401, "无权限", nil)
+	}
+	return true
 }
