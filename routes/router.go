@@ -9,6 +9,8 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+	// 跨域中间件（放在最前面）
+	r.Use(middleware.Cors())
 	// 注册全局异常处理中间件
 	r.Use(middleware.ErrorHandler())
 
@@ -20,6 +22,7 @@ func SetupRouter() *gin.Engine {
 	{
 		userGroup.POST("/login", authHandler.Login)
 		//userGroup.POST("/register", authHandler.Register)
+		//userGroup.GET("test", authHandler.Test)
 	}
 
 	// 需要认证的路由组
