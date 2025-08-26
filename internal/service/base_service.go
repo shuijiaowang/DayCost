@@ -12,6 +12,6 @@ func NewBaseService() *BaseService {
 	}
 }
 
-func (b *BaseService) CheckExpenseOwner(userID, expenseID int) error {
+func (b *BaseService) CheckExpenseExtOwner(userID, expenseID int) error {
 	return b.baseRepo.CheckExpenseOwner(expenseID, userID)
 }
