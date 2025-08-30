@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"DayCost/pkg/util"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // JWTInterceptor 验证JWT令牌的中间件
@@ -13,9 +14,9 @@ func JWTInterceptor() gin.HandlerFunc {
 		// 从请求头获取Authorization
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" {
-			util.Result(c, http.StatusUnauthorized, "未提供token", nil)
-			c.Abort()
-			return
+			util.Result(c, http.StatusUnauthorized, "未提供token", nil) //写响应，前端收到
+			c.Abort()                                                //终止后续处理
+			return                                                   //返回
 		}
 
 		// 检查格式是否为Bearer <token>

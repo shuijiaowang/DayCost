@@ -23,14 +23,9 @@ func NewExpenseExtHandler() *ExpenseExtHandler {
 	}
 }
 func (h *ExpenseExtHandler) AddExpenseExt(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return // 错误已在GetUserID中返回
-	}
+	userID := h.GetUserID(c) //获取用户id
 	var req dto.ExpenseExtDto
-	if !h.Bind(c, &req) {
-		return
-	}
+	h.Bind(c, &req)
 	expenseExt := &model.ExpenseExt{
 		ExpenseID:        req.ExpenseID,
 		ExpenseType:      req.ExpenseType,
@@ -41,10 +36,7 @@ func (h *ExpenseExtHandler) AddExpenseExt(c *gin.Context) {
 		Remaining:        req.Remaining,
 	}
 	// 检查是否为该用户
-	isOwner := h.CheckExpenseExtOwner(c, userID, req.ExpenseID)
-	if !isOwner {
-		return
-	}
+	h.CheckExpenseExtOwner(c, userID, req.ExpenseID)
 	// 添加
 	err := h.expenseExtService.AddExpenseExt(userID, expenseExt)
 	if err != nil {
@@ -56,10 +48,7 @@ func (h *ExpenseExtHandler) AddExpenseExt(c *gin.Context) {
 
 // GetExpenseExtById
 func (h *ExpenseExtHandler) GetExpenseExtById(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 
 	idStr := c.Param("id") //查询id
 	id, err := strconv.Atoi(idStr)
@@ -68,10 +57,8 @@ func (h *ExpenseExtHandler) GetExpenseExtById(c *gin.Context) {
 		return
 	}
 	// 检查是否为该用户
-	isOwner := h.CheckExpenseExtOwner(c, userID, id)
-	if !isOwner {
-		return
-	}
+	h.CheckExpenseExtOwner(c, userID, id)
+
 	expenseExt, err := h.expenseExtService.GetExpenseExtById(id)
 	if err != nil {
 		util.Result(c, 500, "获取失败: "+err.Error(), nil)

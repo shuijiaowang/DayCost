@@ -28,17 +28,12 @@ func NewExpenseHandler() *ExpenseHandler {
 func (h *ExpenseHandler) AddExpense(c *gin.Context) {
 
 	// 复用BaseHandler的GetUserID，减少重复代码
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return // 错误已在GetUserID中返回
-	}
+	userID := h.GetUserID(c)
 
 	// 2. 绑定并验证前端请求参数
 	// 复用BaseHandler的Bind方法
 	var req dto.ExpenseDto
-	if !h.Bind(c, &req) {
-		return // 绑定错误已处理
-	}
+	h.Bind(c, &req)
 	// 3. 转换DTO为数据库模型（只传递需要的字段）
 	expense := &model.Expense{
 		UserID:      userID, // 从上下文获取，前端无法篡改
@@ -62,10 +57,7 @@ func (h *ExpenseHandler) AddExpense(c *gin.Context) {
 // 查id
 func (h *ExpenseHandler) GetExpenseById(c *gin.Context) {
 
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	//获取路径参数
 	id := c.Param("id")
 	// 将当前用户ID和要查询的ID一起传给Service
@@ -80,10 +72,7 @@ func (h *ExpenseHandler) GetExpenseById(c *gin.Context) {
 
 // 查所有
 func (h *ExpenseHandler) ListExpense(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	expense, err := h.expenseService.ListExpense(strconv.Itoa(userID)) //返回切片
 	if err != nil {
 		util.Result(c, 403, "false", nil)
@@ -97,14 +86,9 @@ func (h *ExpenseHandler) ListExpense(c *gin.Context) {
 
 // 条件查询+分页查询
 func (h *ExpenseHandler) ListExpenseByCondition(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	var req dto.ExpensePagesQuery
-	if !h.Bind(c, &req) {
-		return // 绑定错误已处理
-	}
+	h.Bind(c, &req)
 	req.UserID = userID
 	fmt.Println(req)
 	expenses, total, err := h.expenseService.ListExpenseByCondition(req)
@@ -125,14 +109,9 @@ func (h *ExpenseHandler) ListExpenseByCondition(c *gin.Context) {
 // UpdateExpense
 // 前端先获取，再修改保存
 func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	var req dto.ExpenseDto
-	if !h.Bind(c, &req) {
-		return
-	}
+	h.Bind(c, &req)
 
 	req.UserID = userID
 	expense := &model.Expense{
@@ -155,10 +134,7 @@ func (h *ExpenseHandler) UpdateExpense(c *gin.Context) {
 
 // 删除
 func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	id := c.Param("id")
 	err := h.expenseService.DeleteExpense(id, strconv.Itoa(userID))
 	if err != nil {
@@ -170,10 +146,7 @@ func (h *ExpenseHandler) DeleteExpense(c *gin.Context) {
 
 // 恢复
 func (h *ExpenseHandler) RecoverExpense(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	id := c.Param("id")
 	err := h.expenseService.RecoverExpense(id, strconv.Itoa(userID))
 	if err != nil {
@@ -189,10 +162,7 @@ func (h *ExpenseHandler) RecoverExpense(c *gin.Context) {
 //传参的话应该传入月份？
 
 func (h *ExpenseHandler) Statistic(c *gin.Context) {
-	userID, ok := h.GetUserID(c)
-	if !ok {
-		return
-	}
+	userID := h.GetUserID(c)
 	// 1. 获取月份参数（格式：yyyy-mm），默认当前月份
 	month := c.Query("month") // 建议用query参数更灵活，如/statistic?month=2024-05
 	if month == "" {

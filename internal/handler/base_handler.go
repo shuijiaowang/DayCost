@@ -20,36 +20,33 @@ func NewBaseHandler() *BaseHandler {
 	}
 }
 
-// Bind 通用参数绑定方法，自动处理绑定错误
-func (h *BaseHandler) Bind(c *gin.Context, req interface{}) bool {
+// Bind 通用参数绑定方法，绑定失败时抛出自定义错误（由全局中间件处理）
+func (h *BaseHandler) Bind(c *gin.Context, req interface{}) {
 	if err := c.ShouldBindJSON(req); err != nil {
-		util.Result(c, 400, "无效的请求格式: "+err.Error(), nil)
-		return false
+		panic(util.NewAppError(400, "无效的请求格式: "+err.Error(), err))
 	}
-	return true
+	// 绑定成功时无返回值，直接继续执行
 }
 
 // GetUserID 从上下文获取用户ID，封装重复的断言和错误处理
-func (h *BaseHandler) GetUserID(c *gin.Context) (int, bool) {
+func (h *BaseHandler) GetUserID(c *gin.Context) int {
 	userID, exists := c.Get("userID")
 	if !exists {
-		util.Result(c, 401, "未获取到用户信息", nil)
-		return 0, false
+		panic(util.NewAppError(401, "未获取到用户信息", nil))
 	}
 
 	id, ok := userID.(int) //断言用户ID类型
 	if !ok {
-		util.Result(c, 401, "无效的用户ID类型", nil)
-		return 0, false
+		panic(util.NewAppError(401, "无效的用户ID类型", nil))
 	}
-	return id, true
+	return id
 }
 
 // 判断expenseID和userId是否匹配来判断是否有权限？
-func (h *BaseHandler) CheckExpenseExtOwner(c *gin.Context, userID int, expenseID int) bool {
+func (h *BaseHandler) CheckExpenseExtOwner(c *gin.Context, userID int, expenseID int) {
 	err := h.baseService.CheckExpenseExtOwner(userID, expenseID)
 	if err != nil {
-		util.Result(c, 401, "无权限", nil)
+		// 权限校验失败时，抛出自定义AppError，由全局异常中间件统一响应
+		panic(util.NewAppError(401, "无权限操作该消费记录", err))
 	}
-	return true
 }
