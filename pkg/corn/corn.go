@@ -14,9 +14,9 @@ func Init() (*cron.Cron, error) {
 	Cron = cron.New(cron.WithSeconds())
 
 	// 2. 注册所有任务
-	if err := Setup(Cron); err != nil {
-		return nil, err
-	}
+	//if err := Setup(Cron); err != nil {
+	//	return nil, err
+	//}
 
 	// 3. 启动定时任务
 	Cron.Start()

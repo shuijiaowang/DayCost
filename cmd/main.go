@@ -24,7 +24,7 @@ func main() {
 	r := routes.SetupRouter()
 
 	// 启动服务
-	if err := r.Run(":8082"); err != nil {
+	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("服务启动失败: %v", err)
 	}
 }

@@ -20,7 +20,7 @@ type Claims struct {
 // 生成JWT令牌
 func GenerateToken(userID int, username string) (string, error) {
 	// 设置过期时间（例如24小时）
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(240 * time.Hour)
 
 	claims := &Claims{
 		UserID:   userID,

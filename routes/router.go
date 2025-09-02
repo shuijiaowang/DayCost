@@ -22,7 +22,7 @@ func SetupRouter() *gin.Engine {
 	{
 		userGroup.POST("/login", authHandler.Login)
 		//userGroup.POST("/register", authHandler.Register)
-		//userGroup.GET("test", authHandler.Test)
+		userGroup.GET("/test", authHandler.Test)
 	}
 
 	// 需要认证的路由组
@@ -41,6 +41,7 @@ func SetupRouter() *gin.Engine {
 			expenseGroup.DELETE("/:id", expenseHandler.DeleteExpense)       // 删除消费记录
 			expenseGroup.PUT("/recover/:id", expenseHandler.RecoverExpense) //恢复
 			expenseGroup.GET("/statistic", expenseHandler.Statistic)        //默认统计
+			expenseGroup.GET("/test", expenseHandler.Test)                  //默认统计
 		}
 		// 消费拓展路由（需要认证）
 		expenseExtGroup := apiGroup.Group("/expense-ext") //路由使用驼峰？

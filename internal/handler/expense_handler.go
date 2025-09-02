@@ -27,6 +27,7 @@ func NewExpenseHandler() *ExpenseHandler {
 // 增
 func (h *ExpenseHandler) AddExpense(c *gin.Context) {
 
+	println("tianjia")
 	// 复用BaseHandler的GetUserID，减少重复代码
 	userID := h.GetUserID(c)
 
@@ -184,5 +185,10 @@ func (h *ExpenseHandler) Statistic(c *gin.Context) {
 
 	// 4. 返回统计结果
 	util.Result(c, 200, "统计成功", statisticData)
+
+}
+func (h *ExpenseHandler) Test(c *gin.Context) {
+	userID := h.GetUserID(c)
+	util.Result(c, 200, "ok", userID)
 
 }

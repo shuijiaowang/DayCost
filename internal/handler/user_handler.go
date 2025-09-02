@@ -3,6 +3,7 @@ package handler
 import (
 	"DayCost/internal/service"
 	"DayCost/pkg/util"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,4 +47,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"username": user.Username,
 		"token":    token,
 	})
+}
+
+// test
+func (h *AuthHandler) Test(c *gin.Context) {
+	util.Result(c, 200, "ok", gin.H{})
 }
